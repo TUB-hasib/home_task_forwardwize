@@ -7,7 +7,18 @@ import math
 
 def home_task():
     # reading the data set
-    df_main = pd.read_csv("./data/the_office_lines_scripts.csv")
+    df = pd.read_csv("./data/the_office_lines_scripts.csv")
+
+    # .................................Data cleaning....................................................................
+    df_main = df.copy(deep=True) # coping the whle data frame
+
+    # lowercase speaker and line_text column
+    df_main['speaker'] = df_main['speaker'].str.lower()
+    df_main['line_text'] = df_main['line_text'].str.lower()
+
+    #
+
+    #exit()
 
     # ..................................................................................................................
     # Q1:  How many characters are there? What are their names (COMPLETE)
@@ -104,6 +115,15 @@ def home_task():
         ['season', 'episode']).value_counts(normalize=True)
     print(100 * "." + "\nQ8: The average percent of lines each character contributed each episode per season.\nAnswer:")
     print(df_no_words_in_line_for_character)
+
+    # ..................................................................................................................
+    # Q8:Total no of episode aired
+
+    df_episode = df_main[['season', 'episode']].copy(deep=True)  # copying dataframe
+    total_no_of_episode = len(df_episode[['season', 'episode']].drop_duplicates())  # count to no of episode
+    print(100 * "." + "\nQ9: find Total no of episode aired .\nAnswer:")
+    print(f"Total number of episode {total_no_of_episode}")
+
 
 # finding out most common word in a list of words  input: list  output: max element in the list
 def find_most_common_word(list_x):
