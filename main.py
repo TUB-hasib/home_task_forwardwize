@@ -1,8 +1,5 @@
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import numpy as np
 import pandas as pd
-import math
 
 
 def home_task():
@@ -13,34 +10,42 @@ def home_task():
     df_main = df.copy(deep=True) # coping the whle data frame
 
     # lowercase speaker and line_text column
+    print(100 * "."+"\nCleaning data: \n")
+    print("making all string lower case")
     df_main['speaker'] = df_main['speaker'].str.lower()
     df_main['line_text'] = df_main['line_text'].str.lower()
 
-    #
+    # dropping df row when speaker contain 'and ', ', ', '& ', '/'  ':' , or ']'
+    print("Dropping rows when speaker contains 'and ', ', ', '& ', '/', ']' or ':' ")
+    filter_ = df_main['speaker'].str.contains('and ') | df_main['speaker'].str.contains(', ') |\
+              df_main['speaker'].str.contains('& ') | df_main['speaker'].str.contains(':') |\
+              df_main['speaker'].str.contains('/') | df_main['speaker'].str.contains(']')
 
-    #exit()
+    print(f"No of rows dropped: {df_main[filter_].speaker.count()}")
+    df_main.drop(df_main[filter_].index, inplace=True)  # dropping row from dataframe
+    print("Cleaning data complete.\n")
 
-    # ..................................................................................................................
+    # .......................................Q1.........................................................................
     # Q1:  How many characters are there? What are their names (COMPLETE)
     name_of_characters = df_main.speaker.unique()
     no_of_character = len(df_main.speaker.unique())
 
-    print(100 * "."+"\nQ1:  How many characters are there? What are their names?\nAnswer:\n")
+    print(100 * "."+"\n\nQ1:  How many characters are there? What are their names?\nAnswer:")
     print(f"number of character: {no_of_character} ")
     print(f"characters: {name_of_characters}")
 
-    # ..................................................................................................................
+    # .......................................Q2.........................................................................
     # Q2:  For each character, find out who has the most lines across all episodes (COMPLETE)
 
     df_no_lines_for_character = df_main[['speaker', 'line_text']].groupby(
         ['speaker']).count()  # finding no of lines for each character
     df_no_lines_for_character_sorted = df_no_lines_for_character.sort_values(by='line_text')  # sort by no of lines
 
-    print(100 * "." + "\nQ2:  For each character, find out who has the most lines across all episodes\nAnswer:\n")
+    print(100 * "." + "\n\nQ2:  For each character, find out who has the most lines across all episodes\nAnswer:")
     print(f"{df_no_lines_for_character_sorted.tail(1)}")
     # print(df_main['speaker'].value_counts()) # one line to do the wole task 2
 
-    # ..................................................................................................................
+    # .......................................Q3.........................................................................
     # Q3:  What is the average of words per line for each character? (COMPLETE)
 
     df_no_lines_for_character = df_main[['speaker', 'line_text']].groupby(
@@ -56,10 +61,10 @@ def home_task():
 
     df_temp['avg_words'] = df_temp['words_in_line'] / df_temp['line_text']
 
-    print(100 * "." + "\nQ3:  What is the average of words per line for each character?.\nAnswer:\n")
+    print(100 * "." + "\n\nQ3:  What is the average of words per line for each character?.\nAnswer:")
     print(df_temp.sort_values(by='line_text', ascending=0))
 
-    # ..................................................................................................................
+    # .......................................Q4.........................................................................
     # Q4:  What is the most common word per character? (COMPLETE)
     df_common_word = df_main[['speaker', 'line_text']].copy(deep=True)  # copying dataframe
 
@@ -68,13 +73,13 @@ def home_task():
     df_common_word['list_of_words'] = df_common_word['line_text'].apply(
         create_list_of_words)  # creating list of words from line
 
-    print(100 * "." + "\nQ4:   What is the most common word per character?\nAnswer:\n")
+    print(100 * "." + "\n\nQ4:   What is the most common word per character?\nAnswer:")
     df_common_word['most_common_word'] = df_common_word['list_of_words'].apply(find_most_common_word)
     print(df_common_word[['speaker', 'most_common_word']])
 
-    # ..................................................................................................................
+    # .......................................Q5.........................................................................
     # Q5: Number of episodes where the character does not have a line, for each character (COMPLETE)
-    print(100 * "." + "\nQ5 Number of episodes where the character does not have a line,for each character.\nAnswer:\n")
+    print(100 * "." + "\n\nQ5 Number of episodes where the character does not have a line,for each character.\nAnswer:")
 
     df_episode_count = df_main[['speaker', 'season', 'episode']].copy(deep=True)  # copying dataframe
 
@@ -87,16 +92,16 @@ def home_task():
         no_ep_without_line = total_no_of_episode - no_ep_with_line
         print(f"Character: {character}\nNumber of Episode without Line {no_ep_without_line}\n")
 
-    # ..................................................................................................................
+    # .......................................Q6.........................................................................
     # Q6: Number of times "That's what she said" joke comes up (COMPLETE)
-    print(100 * "." + "\nQ6: Number of times \"That's what she said\" joke comes up.\nAnswer:")
-    filter_ = df_main['line_text'].str.contains('That\'s what she said')
+    print(100 * "." + "\n\nQ6: Number of times \"that's what she said\" joke comes up.\nAnswer:")
+    filter_ = df_main['line_text'].str.contains('that\'s what she said')
     print(df_main[filter_].line_text.count())
 
-    # ..................................................................................................................
+    # .......................................Q7.........................................................................
     # Q7:Include five examples of the joke
 
-    print(100 * "." + "\nQ7: Include five examples of the joke.\nAnswer:")
+    print(100 * "." + "\n\nQ7: Include five examples of the joke.\nAnswer:")
     df_temp = df_main[filter_].copy(deep=True)  # dataframe with all the joke lines
     jokes_id_no = df_temp.id.to_numpy()  # storing id no of the jokes
     df_jokes = df_main[['id', 'speaker', 'line_text']]
@@ -108,20 +113,20 @@ def home_task():
         print(df_jokes[filter_])
         joke_count += 1
 
-    # ..................................................................................................................
+    # .......................................Q8.........................................................................
     # Q8:The average percent of lines each character contributed each episode per season
 
     df_no_words_in_line_for_character = df_main[['season', 'episode', 'speaker']].groupby(
         ['season', 'episode']).value_counts(normalize=True)
-    print(100 * "." + "\nQ8: The average percent of lines each character contributed each episode per season.\nAnswer:")
+    print(100 * "." + "\n\nQ8: The average percent of lines each character contributed each ep per season.\nAnswer:")
     print(df_no_words_in_line_for_character)
 
-    # ..................................................................................................................
-    # Q8:Total no of episode aired
+    # .....................................free Question................................................................
+    # Q_Free:Total no of episode aired
 
     df_episode = df_main[['season', 'episode']].copy(deep=True)  # copying dataframe
     total_no_of_episode = len(df_episode[['season', 'episode']].drop_duplicates())  # count to no of episode
-    print(100 * "." + "\nQ9: find Total no of episode aired .\nAnswer:")
+    print(100 * "." + "\n\nQ_Free: find Total no of episode aired .\nAnswer:")
     print(f"Total number of episode {total_no_of_episode}")
 
 
